@@ -16,6 +16,7 @@
 package org.springframework.samples.petclinic.rest;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Collection;
 
 import javax.transaction.Transactional;
@@ -26,8 +27,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.Specialty;
 import org.springframework.samples.petclinic.model.Vet;
+import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -70,6 +73,23 @@ public class VetRestController {
 		return new ResponseEntity<Vet>(vet, HttpStatus.OK);
 	}
 	
+	
+	@RequestMapping(value = "/{vetId}/pets", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<Collection<Pet>> getVetsVisits(@PathVariable("vetId") int vetId){
+		Vet vet = null;
+		vet =  this.clinicService.findVetById(vetId);
+		if(vet == null){
+			return new ResponseEntity<Collection<Pet>>(HttpStatus.NOT_FOUND);
+		}
+		
+		List<Visit> visits = vet.getVisits();
+		List<Pet> pets = new  ArrayList<Pet> (); 
+		 for(Visit visit : visits) {
+	       pets.add(visit.getPet());
+	        }
+
+		return new ResponseEntity<Collection<Pet>>(pets, HttpStatus.OK);
+	}
 	
 	@RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Vet> addVet(@RequestBody @Valid Vet vet, BindingResult bindingResult, UriComponentsBuilder ucBuilder){

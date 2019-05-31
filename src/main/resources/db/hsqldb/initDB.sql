@@ -62,3 +62,12 @@ CREATE TABLE visits (
 );
 ALTER TABLE visits ADD CONSTRAINT fk_visits_pets FOREIGN KEY (pet_id) REFERENCES pets (id);
 CREATE INDEX visits_pet_id ON visits (pet_id);
+
+
+
+CREATE TABLE vet_visits (
+  vet_id       INTEGER NOT NULL,
+  visit_id INTEGER NOT NULL
+);
+ALTER TABLE vet_visits ADD CONSTRAINT fk_vet_visits_vets FOREIGN KEY (vet_id) REFERENCES vets (id);
+ALTER TABLE vet_visits ADD CONSTRAINT fk_vet_visits_visits FOREIGN KEY (visit_id) REFERENCES visits (id);

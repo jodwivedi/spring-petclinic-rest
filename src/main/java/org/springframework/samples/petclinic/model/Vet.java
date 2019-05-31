@@ -21,11 +21,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 
@@ -81,5 +83,44 @@ public class Vet extends Person {
     public void clearSpecialties() {
         getSpecialtiesInternal().clear();
     }
+
+   
+    @JoinTable(name = "vet_visits", joinColumns = @JoinColumn(name = "vet_id"),
+        inverseJoinColumns = @JoinColumn(name = "visit_id"))
+    @OneToMany
+    private Set<Visit> visits;
+    
+    @JsonIgnore
+    protected Set<Visit> getVisitsInternal() {
+        if (this.visits == null) {
+            this.visits = new HashSet<>();
+        }
+        return this.visits;
+    }
+
+    protected void setVisitsInternal(Set<Visit> visits) {
+        this.visits = visits;
+    }
+
+    @XmlElement
+    public List<Visit> getVisits() {
+        List<Visit> sortedSpecs = new ArrayList<>(getVisitsInternal());
+        PropertyComparator.sort(sortedSpecs, new MutableSortDefinition("name", true, true));
+        return Collections.unmodifiableList(sortedSpecs);
+    }
+    @JsonIgnore
+    public int getNrOfVisits() {
+        return getVisitsInternal().size();
+    }
+
+    public void addVisit(Visit visit) {
+        getVisitsInternal().add(visit);
+    }
+    
+    public void clearVisits() {
+        getVisitsInternal().clear();
+    }
+    
+    
 
 }
